@@ -18,8 +18,7 @@
   header .t{ font-size:18px; font-weight:800; }
   header .chip{ margin-left:auto; font-size:12px; font-weight:700; background:rgba(255,255,255,.16); padding:6px 10px; border-radius:9px; }
   main{ padding:18px; max-width:520px; margin:0 auto; }
-  .vista{ display:none; }
-  .vista.activa{ display:block; }
+  .vista{ display:none; } .vista.activa{ display:block; }
   h2{ font-size:20px; margin:4px 0 16px; }
   label{ font-size:13px; font-weight:600; color:var(--mut); display:block; margin:14px 0 6px; }
   select,input{ width:100%; height:52px; border:1.5px solid #D5DEEC; border-radius:13px; padding:0 14px; font-size:16px; font-weight:600; color:var(--txt); background:#F8FAFD; font-family:inherit; }
@@ -35,8 +34,7 @@
   #reader{ display:none; width:100%; border-radius:14px; overflow:hidden; margin-top:14px; background:#000; }
   .stat{ background:#fff; border-radius:14px; padding:14px 16px; display:flex; align-items:center; gap:14px; box-shadow:0 4px 14px rgba(15,23,42,.05); margin-top:14px; }
   .stat .n{ font-size:30px; font-weight:800; color:var(--azul); min-width:44px; text-align:center; }
-  .stat .l{ font-size:14px; font-weight:700; }
-  .stat .s{ font-size:12px; color:var(--mut); font-weight:500; }
+  .stat .l{ font-size:14px; font-weight:700; } .stat .s{ font-size:12px; color:var(--mut); font-weight:500; }
   .hdr{ font-size:12px; font-weight:700; color:var(--mut); letter-spacing:.4px; margin:18px 0 8px; }
   .item{ background:#fff; border-radius:13px; padding:12px 14px; display:flex; align-items:center; gap:12px; box-shadow:0 3px 10px rgba(15,23,42,.05); margin-bottom:9px; }
   .item .badge{ width:34px; height:34px; border-radius:10px; background:#FCEFD4; color:#9A6B12; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:14px; }
@@ -46,13 +44,11 @@
   .rrow b{ color:var(--azul); font-variant-numeric:tabular-nums; }
   .ok{ background:#DCFCE7; border:1.5px solid #86EFAC; color:#166534; border-radius:13px; padding:12px 14px; font-weight:700; font-size:13.5px; margin-top:14px; }
   .barra{ position:sticky; bottom:0; background:var(--bg); padding:14px 0 6px; }
-  /* modal duplicado */
   .modal{ display:none; position:fixed; inset:0; background:rgba(15,23,42,.45); z-index:20; align-items:center; justify-content:center; padding:24px; }
   .modal.activa{ display:flex; }
   .modal .box{ background:#fff; border-radius:18px; padding:22px; max-width:360px; width:100%; text-align:center; }
   .modal .ic{ width:58px; height:58px; border-radius:50%; background:#DC2626; color:#fff; font-size:30px; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; }
-  .modal h3{ margin:0 0 6px; color:#991B1B; font-size:18px; }
-  .modal p{ margin:0 0 18px; color:#B91C1C; font-size:14px; line-height:1.5; }
+  .modal h3{ margin:0 0 6px; color:#991B1B; font-size:18px; } .modal p{ margin:0 0 18px; color:#B91C1C; font-size:14px; line-height:1.5; }
   .finwrap{ text-align:center; padding-top:40px; }
   .finwrap .big{ width:84px; height:84px; border-radius:50%; background:#15803D; color:#fff; font-size:44px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
 </style>
@@ -66,8 +62,6 @@
 </header>
 
 <main>
-
-  <!-- INICIO -->
   <section id="vInicio" class="vista activa">
     <h2>Nuevo despacho</h2>
     <div class="card">
@@ -75,13 +69,10 @@
       <select id="selCamion"><option value="">Seleccione…</option></select>
       <label for="selDestino">Destino</label>
       <select id="selDestino"><option value="">Seleccione…</option></select>
-      <label for="inpOperador">Operador (correo, opcional)</label>
-      <input id="inpOperador" type="text" placeholder="tu correo">
     </div>
     <button class="btn azul mt" onclick="iniciar()">Iniciar despacho →</button>
   </section>
 
-  <!-- ESCANEO -->
   <section id="vEscaneo" class="vista">
     <button class="btn negro" id="btnScan" onclick="toggleScan()">📷 Escanear código</button>
     <div id="reader"></div>
@@ -95,7 +86,6 @@
     <div class="barra"><button class="btn azul" onclick="revisar()">Revisar y enviar →</button></div>
   </section>
 
-  <!-- RESUMEN -->
   <section id="vResumen" class="vista">
     <h2>Resumen del despacho</h2>
     <div class="card">
@@ -109,7 +99,6 @@
     <div class="barra"><button class="btn verde" id="btnEnviar" onclick="enviar()">✈ Enviar despacho</button></div>
   </section>
 
-  <!-- FIN -->
   <section id="vFin" class="vista">
     <div class="finwrap">
       <div class="big">✓</div>
@@ -118,10 +107,8 @@
       <button class="btn azul mt" onclick="nuevo()">Nuevo despacho</button>
     </div>
   </section>
-
 </main>
 
-<!-- MODAL DUPLICADO -->
 <div class="modal" id="modal">
   <div class="box">
     <div class="ic">!</div>
@@ -133,12 +120,15 @@
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
-
+  /* ====== URL del backend (Apps Script) ====== */
   const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxb-PiJUXv1a-c_SRKa9BMMJE1fTE4SAdgSZHV2z3uTv-QX6emldIkLbazUquKmIhVxuw/exec";
+  /* =========================================== */
 
   const $ = (id) => document.getElementById(id);
-  let estado = { camion:"", destino:"", operador:"", codigos:[] };
-  let html5qr = null, escaneando = false, lockScan = false;
+  let estado = { camion:"", destino:"", codigos:[] };
+  let html5qr = null, escaneando = false;
+  let procesando = false;            // candado: procesa un escaneo a la vez
+  const pendientes = new Set();      // códigos en verificación (evita que se cuele un duplicado)
 
   function mostrar(id){
     document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
@@ -154,7 +144,7 @@
       const d = await r.json();
       llenar('selCamion', d.camiones || []);
       llenar('selDestino', d.destinos || []);
-    }catch(e){ /* sin conexión: se dejan vacíos */ }
+    }catch(e){}
   }
   function llenar(id, arr){
     $(id).innerHTML = '<option value="">Seleccione…</option>' + arr.map(x => `<option>${x}</option>`).join('');
@@ -163,25 +153,19 @@
   function iniciar(){
     estado.camion = $('selCamion').value;
     estado.destino = $('selDestino').value;
-    estado.operador = ($('inpOperador').value || '').trim();
     if(!estado.camion || !estado.destino){ alert('Elige camión y destino.'); return; }
-    estado.codigos = [];
+    estado.codigos = []; pendientes.clear(); procesando = false;
     $('chipCam').textContent = estado.camion;
     $('chipDes').textContent = estado.destino;
-    render();
-    mostrar('vEscaneo');
+    render(); mostrar('vEscaneo');
   }
 
   async function toggleScan(){
     if(escaneando){ await pararScan(); return; }
     if(typeof Html5Qrcode === 'undefined'){ alert('No se cargó el lector. Revisa tu internet o usa "Escribir código manual".'); return; }
     $('reader').style.display = 'block';
-    const formats = [
-      Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39,
-      Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
-      Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E,
-      Html5QrcodeSupportedFormats.ITF, Html5QrcodeSupportedFormats.QR_CODE
-    ];
+    const F = Html5QrcodeSupportedFormats;
+    const formats = [F.CODE_128, F.CODE_39, F.EAN_13, F.EAN_8, F.UPC_A, F.UPC_E, F.ITF, F.QR_CODE];
     html5qr = new Html5Qrcode("reader", { formatsToSupport: formats, verbose:false });
     try{
       await html5qr.start({ facingMode:"environment" }, { fps:10, qrbox:{ width:270, height:170 } }, onScan, () => {});
@@ -194,19 +178,31 @@
   }
 
   async function onScan(code){
-    if(lockScan) return; lockScan = true; setTimeout(() => lockScan = false, 1500);
     code = (code || '').trim(); if(!code) return;
-    if(estado.codigos.includes(code)){
-      alertaDup('Código duplicado', 'El código ' + code + ' ya está en este despacho.'); return;
+    if(procesando) return;            // ya hay un escaneo en curso: ignora
+    procesando = true;
+    try{
+      // duplicado inmediato (ya está en la lista o en verificación)
+      if(estado.codigos.includes(code) || pendientes.has(code)){
+        alertaDup('Código duplicado', 'El código ' + code + ' ya está en este despacho.');
+        return;
+      }
+      pendientes.add(code);
+      if(BACKEND_URL){
+        try{
+          const r = await fetch(BACKEND_URL + '?codigo=' + encodeURIComponent(code));
+          const d = await r.json();
+          if(d.usado){
+            pendientes.delete(code);
+            alertaDup('Código ya despachado', 'El código ' + code + ' ya fue enviado en el ' + d.camion + ' el ' + d.fecha + '.');
+            return;
+          }
+        }catch(e){}
+      }
+      estado.codigos.push(code); pendientes.delete(code); render(); beep();
+    } finally {
+      setTimeout(() => { procesando = false; }, 700);   // respiro para no releer el mismo código
     }
-    if(BACKEND_URL){
-      try{
-        const r = await fetch(BACKEND_URL + '?codigo=' + encodeURIComponent(code));
-        const d = await r.json();
-        if(d.usado){ alertaDup('Código ya despachado', 'El código ' + code + ' ya fue enviado en el ' + d.camion + ' el ' + d.fecha + '.'); return; }
-      }catch(e){ /* si la consulta falla, se agrega igual */ }
-    }
-    estado.codigos.push(code); render(); beep();
   }
 
   function render(){
@@ -228,19 +224,18 @@
     $('rDes').textContent = estado.destino;
     $('rTot').textContent = estado.codigos.length;
     $('rLista').innerHTML = estado.codigos.map((c,i) =>
-      `<div class="rrow"><span>Código ${i+1}</span><b>${c}</b></div>`
-    ).join('');
+      `<div class="rrow"><span>Código ${i+1}</span><b>${c}</b></div>`).join('');
     mostrar('vResumen');
   }
 
   async function enviar(){
-    if(!BACKEND_URL){ alert('Falta configurar la URL del backend en el código (BACKEND_URL).'); return; }
+    if(!BACKEND_URL){ alert('Falta configurar la URL del backend.'); return; }
     const btn = $('btnEnviar'); btn.disabled = true; btn.textContent = 'Enviando…';
     try{
       const r = await fetch(BACKEND_URL, {
         method:'POST',
         headers:{ 'Content-Type':'text/plain;charset=utf-8' },
-        body: JSON.stringify({ camion:estado.camion, destino:estado.destino, operador:estado.operador, codigos:estado.codigos })
+        body: JSON.stringify({ camion:estado.camion, destino:estado.destino, codigos:estado.codigos })
       });
       const d = await r.json();
       if(d.ok){ $('finMsg').textContent = d.total_codigos + ' códigos enviados y guardados.'; mostrar('vFin'); }
@@ -249,7 +244,7 @@
     finally{ btn.disabled = false; btn.textContent = '✈ Enviar despacho'; }
   }
 
-  function nuevo(){ estado = { camion:"", destino:"", operador:"", codigos:[] }; $('selCamion').value=''; $('selDestino').value=''; mostrar('vInicio'); }
+  function nuevo(){ estado = { camion:"", destino:"", codigos:[] }; pendientes.clear(); procesando = false; $('selCamion').value=''; $('selDestino').value=''; mostrar('vInicio'); }
 
   function beep(){ try{ const a = new (window.AudioContext||window.webkitAudioContext)(); const o = a.createOscillator(); o.frequency.value=880; o.connect(a.destination); o.start(); setTimeout(()=>o.stop(),90); }catch(e){} }
 
