@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#1E5AA0">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Despachos CBN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+  :root{ --azul:#1E5AA0; --negro:#141413; --bg:#EEF2F9; --txt:#0F172A; --mut:#64748B; }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body{ margin:0; font-family:Inter,sans-serif; background:var(--bg); color:var(--txt); }
+  header{ background:var(--azul); color:#fff; padding:14px 18px; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:5; }
+  .logo{ width:40px; height:40px; border-radius:10px; background:#fff; color:var(--azul); font-weight:800; font-size:15px; display:flex; align-items:center; justify-content:center; letter-spacing:.5px; }
+  header .t{ font-size:18px; font-weight:800; }
+  header .chip{ margin-left:auto; font-size:12px; font-weight:700; background:rgba(255,255,255,.16); padding:6px 10px; border-radius:9px; }
+  main{ padding:18px; max-width:520px; margin:0 auto; }
+  .vista{ display:none; }
+  .vista.activa{ display:block; }
+  h2{ font-size:20px; margin:4px 0 16px; }
+  label{ font-size:13px; font-weight:600; color:var(--mut); display:block; margin:14px 0 6px; }
+  select,input{ width:100%; height:52px; border:1.5px solid #D5DEEC; border-radius:13px; padding:0 14px; font-size:16px; font-weight:600; color:var(--txt); background:#F8FAFD; font-family:inherit; }
+  .card{ background:#fff; border-radius:16px; padding:16px; box-shadow:0 4px 16px rgba(15,23,42,.06); }
+  button{ font-family:inherit; cursor:pointer; border:none; }
+  .btn{ width:100%; height:56px; border-radius:14px; font-size:16px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .btn.azul{ background:var(--azul); color:#fff; }
+  .btn.negro{ background:var(--negro); color:#fff; height:74px; font-size:18px; }
+  .btn.verde{ background:#15803D; color:#fff; }
+  .btn.ghost{ background:transparent; color:var(--azul); height:44px; font-weight:700; }
+  .btn:disabled{ opacity:.5; }
+  .mt{ margin-top:14px; }
+  #reader{ display:none; width:100%; border-radius:14px; overflow:hidden; margin-top:14px; background:#000; }
+  .stat{ background:#fff; border-radius:14px; padding:14px 16px; display:flex; align-items:center; gap:14px; box-shadow:0 4px 14px rgba(15,23,42,.05); margin-top:14px; }
+  .stat .n{ font-size:30px; font-weight:800; color:var(--azul); min-width:44px; text-align:center; }
+  .stat .l{ font-size:14px; font-weight:700; }
+  .stat .s{ font-size:12px; color:var(--mut); font-weight:500; }
+  .hdr{ font-size:12px; font-weight:700; color:var(--mut); letter-spacing:.4px; margin:18px 0 8px; }
+  .item{ background:#fff; border-radius:13px; padding:12px 14px; display:flex; align-items:center; gap:12px; box-shadow:0 3px 10px rgba(15,23,42,.05); margin-bottom:9px; }
+  .item .badge{ width:34px; height:34px; border-radius:10px; background:#FCEFD4; color:#9A6B12; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:14px; }
+  .item .cod{ flex:1; font-weight:700; font-variant-numeric:tabular-nums; }
+  .item .x{ width:32px; height:32px; border-radius:9px; background:#F1F5F9; color:#94A3B8; font-size:14px; }
+  .rrow{ display:flex; justify-content:space-between; padding:11px 14px; border-bottom:1px solid #EDF1F7; font-size:14px; }
+  .rrow b{ color:var(--azul); font-variant-numeric:tabular-nums; }
+  .ok{ background:#DCFCE7; border:1.5px solid #86EFAC; color:#166534; border-radius:13px; padding:12px 14px; font-weight:700; font-size:13.5px; margin-top:14px; }
+  .barra{ position:sticky; bottom:0; background:var(--bg); padding:14px 0 6px; }
+  /* modal duplicado */
+  .modal{ display:none; position:fixed; inset:0; background:rgba(15,23,42,.45); z-index:20; align-items:center; justify-content:center; padding:24px; }
+  .modal.activa{ display:flex; }
+  .modal .box{ background:#fff; border-radius:18px; padding:22px; max-width:360px; width:100%; text-align:center; }
+  .modal .ic{ width:58px; height:58px; border-radius:50%; background:#DC2626; color:#fff; font-size:30px; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; }
+  .modal h3{ margin:0 0 6px; color:#991B1B; font-size:18px; }
+  .modal p{ margin:0 0 18px; color:#B91C1C; font-size:14px; line-height:1.5; }
+  .finwrap{ text-align:center; padding-top:40px; }
+  .finwrap .big{ width:84px; height:84px; border-radius:50%; background:#15803D; color:#fff; font-size:44px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">CBN</div>
+  <div class="t">Despachos</div>
+  <div class="chip" id="chipHdr" style="display:none"><span id="chipCam"></span> → <span id="chipDes"></span></div>
+</header>
+
+<main>
+
+  <!-- INICIO -->
+  <section id="vInicio" class="vista activa">
+    <h2>Nuevo despacho</h2>
+    <div class="card">
+      <label for="selCamion">Camión</label>
+      <select id="selCamion"><option value="">Seleccione…</option></select>
+      <label for="selDestino">Destino</label>
+      <select id="selDestino"><option value="">Seleccione…</option></select>
+      <label for="inpOperador">Operador (correo, opcional)</label>
+      <input id="inpOperador" type="text" placeholder="tu correo">
+    </div>
+    <button class="btn azul mt" onclick="iniciar()">Iniciar despacho →</button>
+  </section>
+
+  <!-- ESCANEO -->
+  <section id="vEscaneo" class="vista">
+    <button class="btn negro" id="btnScan" onclick="toggleScan()">📷 Escanear código</button>
+    <div id="reader"></div>
+    <button class="btn ghost" onclick="manual()">+ Escribir código manual</button>
+    <div class="stat">
+      <div class="n" id="contador">0</div>
+      <div><div class="l">Códigos escaneados</div><div class="s">Se enviarán todos al despachar</div></div>
+    </div>
+    <div class="hdr">CÓDIGOS ESCANEADOS</div>
+    <div id="lista"></div>
+    <div class="barra"><button class="btn azul" onclick="revisar()">Revisar y enviar →</button></div>
+  </section>
+
+  <!-- RESUMEN -->
+  <section id="vResumen" class="vista">
+    <h2>Resumen del despacho</h2>
+    <div class="card">
+      <div class="rrow"><span>Camión</span><b id="rCam"></b></div>
+      <div class="rrow"><span>Destino</span><b id="rDes"></b></div>
+      <div class="rrow" style="border:none"><span>Total de códigos</span><b id="rTot"></b></div>
+    </div>
+    <div class="ok">✓ Sin códigos duplicados — listo para enviar</div>
+    <div class="hdr">CÓDIGOS</div>
+    <div class="card" id="rLista" style="padding:0"></div>
+    <div class="barra"><button class="btn verde" id="btnEnviar" onclick="enviar()">✈ Enviar despacho</button></div>
+  </section>
+
+  <!-- FIN -->
+  <section id="vFin" class="vista">
+    <div class="finwrap">
+      <div class="big">✓</div>
+      <h2>Despacho enviado</h2>
+      <p style="color:var(--mut)" id="finMsg"></p>
+      <button class="btn azul mt" onclick="nuevo()">Nuevo despacho</button>
+    </div>
+  </section>
+
+</main>
+
+<!-- MODAL DUPLICADO -->
+<div class="modal" id="modal">
+  <div class="box">
+    <div class="ic">!</div>
+    <h3 id="dupT">Código duplicado</h3>
+    <p id="dupM"></p>
+    <button class="btn azul" onclick="cerrarDup()">Entendido</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+  /* ====== CONFIG: pega aquí la URL /exec de tu Apps Script ====== */
+  const BACKEND_URL = "";
+  /* ============================================================= */
+
+  const $ = (id) => document.getElementById(id);
+  let estado = { camion:"", destino:"", operador:"", codigos:[] };
+  let html5qr = null, escaneando = false, lockScan = false;
+
+  function mostrar(id){
+    document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
+    $(id).classList.add('activa');
+    $('chipHdr').style.display = (id === 'vEscaneo' || id === 'vResumen') ? 'block' : 'none';
+    window.scrollTo(0,0);
+  }
+
+  async function cargarListas(){
+    if(!BACKEND_URL) return;
+    try{
+      const r = await fetch(BACKEND_URL);
+      const d = await r.json();
+      llenar('selCamion', d.camiones || []);
+      llenar('selDestino', d.destinos || []);
+    }catch(e){ /* sin conexión: se dejan vacíos */ }
+  }
+  function llenar(id, arr){
+    $(id).innerHTML = '<option value="">Seleccione…</option>' + arr.map(x => `<option>${x}</option>`).join('');
+  }
+
+  function iniciar(){
+    estado.camion = $('selCamion').value;
+    estado.destino = $('selDestino').value;
+    estado.operador = ($('inpOperador').value || '').trim();
+    if(!estado.camion || !estado.destino){ alert('Elige camión y destino.'); return; }
+    estado.codigos = [];
+    $('chipCam').textContent = estado.camion;
+    $('chipDes').textContent = estado.destino;
+    render();
+    mostrar('vEscaneo');
+  }
+
+  async function toggleScan(){
+    if(escaneando){ await pararScan(); return; }
+    if(typeof Html5Qrcode === 'undefined'){ alert('No se cargó el lector. Revisa tu internet o usa "Escribir código manual".'); return; }
+    $('reader').style.display = 'block';
+    const formats = [
+      Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39,
+      Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
+      Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E,
+      Html5QrcodeSupportedFormats.ITF, Html5QrcodeSupportedFormats.QR_CODE
+    ];
+    html5qr = new Html5Qrcode("reader", { formatsToSupport: formats, verbose:false });
+    try{
+      await html5qr.start({ facingMode:"environment" }, { fps:10, qrbox:{ width:270, height:170 } }, onScan, () => {});
+      escaneando = true; $('btnScan').textContent = '■ Detener cámara';
+    }catch(e){ $('reader').style.display='none'; alert('No se pudo abrir la cámara: ' + e); }
+  }
+  async function pararScan(){
+    if(html5qr){ try{ await html5qr.stop(); await html5qr.clear(); }catch(e){} }
+    escaneando = false; $('reader').style.display='none'; $('btnScan').textContent = '📷 Escanear código';
+  }
+
+  async function onScan(code){
+    if(lockScan) return; lockScan = true; setTimeout(() => lockScan = false, 1500);
+    code = (code || '').trim(); if(!code) return;
+    if(estado.codigos.includes(code)){
+      alertaDup('Código duplicado', 'El código ' + code + ' ya está en este despacho.'); return;
+    }
+    if(BACKEND_URL){
+      try{
+        const r = await fetch(BACKEND_URL + '?codigo=' + encodeURIComponent(code));
+        const d = await r.json();
+        if(d.usado){ alertaDup('Código ya despachado', 'El código ' + code + ' ya fue enviado en el ' + d.camion + ' el ' + d.fecha + '.'); return; }
+      }catch(e){ /* si la consulta falla, se agrega igual */ }
+    }
+    estado.codigos.push(code); render(); beep();
+  }
+
+  function render(){
+    $('contador').textContent = estado.codigos.length;
+    $('lista').innerHTML = estado.codigos.map((c,i) =>
+      `<div class="item"><div class="badge">${i+1}</div><div class="cod">${c}</div><button class="x" onclick="quitar(${i})">✕</button></div>`
+    ).reverse().join('');
+  }
+  function quitar(i){ estado.codigos.splice(i,1); render(); }
+  function manual(){ const c = prompt('Código:'); if(c){ onScan(c.trim()); } }
+
+  function alertaDup(t,m){ $('dupT').textContent=t; $('dupM').textContent=m; $('modal').classList.add('activa'); if(navigator.vibrate) navigator.vibrate(200); }
+  function cerrarDup(){ $('modal').classList.remove('activa'); }
+
+  async function revisar(){
+    if(!estado.codigos.length){ alert('No hay códigos escaneados.'); return; }
+    await pararScan();
+    $('rCam').textContent = estado.camion;
+    $('rDes').textContent = estado.destino;
+    $('rTot').textContent = estado.codigos.length;
+    $('rLista').innerHTML = estado.codigos.map((c,i) =>
+      `<div class="rrow"><span>Código ${i+1}</span><b>${c}</b></div>`
+    ).join('');
+    mostrar('vResumen');
+  }
+
+  async function enviar(){
+    if(!BACKEND_URL){ alert('Falta configurar la URL del backend en el código (BACKEND_URL).'); return; }
+    const btn = $('btnEnviar'); btn.disabled = true; btn.textContent = 'Enviando…';
+    try{
+      const r = await fetch(BACKEND_URL, {
+        method:'POST',
+        headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+        body: JSON.stringify({ camion:estado.camion, destino:estado.destino, operador:estado.operador, codigos:estado.codigos })
+      });
+      const d = await r.json();
+      if(d.ok){ $('finMsg').textContent = d.total_codigos + ' códigos enviados y guardados.'; mostrar('vFin'); }
+      else { alertaDup('No se pudo enviar', d.error || 'Error desconocido'); }
+    }catch(e){ alert('Error de red: ' + e); }
+    finally{ btn.disabled = false; btn.textContent = '✈ Enviar despacho'; }
+  }
+
+  function nuevo(){ estado = { camion:"", destino:"", operador:"", codigos:[] }; $('selCamion').value=''; $('selDestino').value=''; mostrar('vInicio'); }
+
+  function beep(){ try{ const a = new (window.AudioContext||window.webkitAudioContext)(); const o = a.createOscillator(); o.frequency.value=880; o.connect(a.destination); o.start(); setTimeout(()=>o.stop(),90); }catch(e){} }
+
+  if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+  cargarListas();
+</script>
+</body>
+</html>
