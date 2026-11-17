@@ -248,7 +248,7 @@
         try{
           const r = await fetch(BACKEND_URL + '?codigo=' + encodeURIComponent(code));
           const d = await r.json();
-          if(d.usado){ pendientes.delete(code); alertaDup('Código ya despachado', 'El código ' + code + ' ya fue enviado en el ' + d.camion + ' el ' + d.fecha + '.'); return; }
+          if(d.usado){ pendientes.delete(code); alertaDup('Código ya despachado', 'El código ' + code + ' ya fue enviado en el camion con placa: ' + d.camion + ' el ' + d.fecha + '.'); return; }
         }catch(e){}
       }
       estado.codigos.push(code); pendientes.delete(code); render(); beep();
