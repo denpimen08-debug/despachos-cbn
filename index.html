@@ -27,7 +27,7 @@
   .btn{ width:100%; height:56px; border-radius:14px; font-size:16px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px; }
   .btn.azul{ background:var(--azul); color:#fff; } .btn.negro{ background:var(--negro); color:#fff; height:74px; font-size:18px; }
   .btn.verde{ background:#15803D; color:#fff; } .btn.ghost{ background:transparent; color:var(--azul); height:44px; font-weight:700; }
-  .btn.sm{ height:46px; font-size:14px; }
+  .btn.gris{ background:#F1F5F9; color:#334155; } .btn.sm{ height:46px; font-size:14px; }
   .btn:disabled{ opacity:.5; }
   .mt{ margin-top:14px; }
   #reader{ display:none; width:100%; border-radius:14px; overflow:hidden; margin-top:14px; background:#000; }
@@ -46,11 +46,12 @@
   .modal{ display:none; position:fixed; inset:0; background:rgba(15,23,42,.45); z-index:20; align-items:center; justify-content:center; padding:24px; }
   .modal.activa{ display:flex; }
   .modal .box{ background:#fff; border-radius:18px; padding:22px; max-width:360px; width:100%; text-align:center; }
-  .modal .ic{ width:58px; height:58px; border-radius:50%; background:#DC2626; color:#fff; font-size:30px; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; }
-  .modal h3{ margin:0 0 6px; color:#991B1B; font-size:18px; } .modal p{ margin:0 0 18px; color:#B91C1C; font-size:14px; line-height:1.5; }
+  .modal .ic{ width:58px; height:58px; border-radius:50%; color:#fff; font-size:28px; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; }
+  .modal .ic.rojo{ background:#DC2626; } .modal .ic.azul{ background:#1E5AA0; }
+  .modal h3{ margin:0 0 6px; font-size:18px; }
+  .modal .fila{ display:flex; gap:10px; }
   .finwrap{ text-align:center; padding-top:40px; }
   .finwrap .big{ width:84px; height:84px; border-radius:50%; background:#15803D; color:#fff; font-size:44px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
-  /* buscador de camión */
   .sug{ padding:12px 14px; border-bottom:1px solid #EDF1F7; display:flex; flex-direction:column; cursor:pointer; }
   .sug:active{ background:#F1F6FD; } .sug b{ font-size:15px; } .sug span{ font-size:12px; color:var(--mut); }
   #sugerencias{ background:#fff; border-radius:0 0 13px 13px; max-height:230px; overflow:auto; box-shadow:0 6px 16px rgba(15,23,42,.08); }
@@ -70,18 +71,13 @@
 <main>
   <section id="vInicio" class="vista activa">
     <h2>Nuevo despacho</h2>
-
     <button class="btn ghost" onclick="toggleNuevo()">➕ Registrar nuevo camión</button>
     <div class="card" id="formNuevo">
-      <label for="nvPlaca">Placa</label>
-      <input id="nvPlaca" placeholder="Ej: 1234-ABC">
-      <label for="nvChofer">Chofer</label>
-      <input id="nvChofer" placeholder="Nombre del chofer">
-      <label for="nvTipo">Tipo de camión</label>
-      <input id="nvTipo" placeholder="Ej: Furgón, Cisterna…">
+      <label for="nvPlaca">Placa</label><input id="nvPlaca" placeholder="Ej: 1234-ABC">
+      <label for="nvChofer">Chofer</label><input id="nvChofer" placeholder="Nombre del chofer">
+      <label for="nvTipo">Tipo de camión</label><input id="nvTipo" placeholder="Ej: Furgón, Cisterna…">
       <button class="btn azul sm mt" id="btnGuardarCam" onclick="guardarCamion()">Guardar camión</button>
     </div>
-
     <div class="card mt">
       <label for="inpBuscar">Camión</label>
       <input id="inpBuscar" oninput="filtrar()" placeholder="Escribe el número o la placa…" autocomplete="off">
@@ -90,12 +86,11 @@
       <label for="selDestino">Destino</label>
       <select id="selDestino"><option value="">Seleccione…</option></select>
     </div>
-
     <button class="btn azul mt" onclick="iniciar()">Iniciar despacho →</button>
   </section>
 
   <section id="vEscaneo" class="vista">
-    <button class="btn negro" id="btnScan" onclick="toggleScan()">📷 Escanear código</button>
+    <button class="btn negro" id="btnScan" onclick="toggleScan()">📷 Escanear palet</button>
     <div id="reader"></div>
     <button class="btn ghost" onclick="manual()">+ Escribir código manual</button>
     <div class="stat">
@@ -132,11 +127,25 @@
   </section>
 </main>
 
+<!-- Confirmar agregar palet -->
+<div class="modal" id="modalAdd">
+  <div class="box">
+    <div class="ic azul">▦</div>
+    <h3 style="color:#1E5AA0">Palet leído</h3>
+    <p style="margin:0 0 18px;color:#334155;font-size:16px">PALETA: <b id="addCod" style="font-family:monospace;font-size:18px;color:#0F172A"></b></p>
+    <div class="fila">
+      <button class="btn gris" onclick="cancelarAdd()">Cancelar</button>
+      <button class="btn verde" onclick="confirmarAdd()">Agregar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Alerta de duplicado -->
 <div class="modal" id="modal">
   <div class="box">
-    <div class="ic">!</div>
-    <h3 id="dupT">Código duplicado</h3>
-    <p id="dupM"></p>
+    <div class="ic rojo">!</div>
+    <h3 id="dupT" style="color:#991B1B">Palet duplicado</h3>
+    <p id="dupM" style="margin:0 0 18px;color:#B91C1C;font-size:14px;line-height:1.5"></p>
     <button class="btn azul" onclick="cerrarDup()">Entendido</button>
   </div>
 </div>
@@ -148,10 +157,12 @@
   /* =========================================== */
 
   const $ = (id) => document.getElementById(id);
-  let camiones = [];                 // [{placa, chofer, tipo}]
+  let camiones = [];
   let estado = { camion:"", chofer:"", tipo:"", destino:"", codigos:[] };
-  let html5qr = null, escaneando = false, procesando = false;
-  const pendientes = new Set();
+  let html5qr = null, escaneando = false;
+  let esperando = false;             // true mientras hay un modal abierto tras un escaneo
+  let codPendiente = "";             // palet leído esperando confirmación
+  let ultimo = { code:"", t:0 };     // para ignorar la misma lectura al seguir enfocando
 
   function mostrar(id){
     document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
@@ -159,12 +170,12 @@
     $('chipHdr').style.display = (id === 'vEscaneo' || id === 'vResumen') ? 'block' : 'none';
     window.scrollTo(0,0);
   }
+  function vibrar(ms){ if(navigator.vibrate) navigator.vibrate(ms); }
 
   async function cargarListas(){
     if(!BACKEND_URL) return;
     try{
-      const r = await fetch(BACKEND_URL);
-      const d = await r.json();
+      const r = await fetch(BACKEND_URL); const d = await r.json();
       camiones = d.camiones || [];
       $('selDestino').innerHTML = '<option value="">Seleccione…</option>' + (d.destinos || []).map(x => `<option>${x}</option>`).join('');
     }catch(e){}
@@ -172,8 +183,7 @@
 
   /* ---- buscador de camión ---- */
   function filtrar(){
-    const q = $('inpBuscar').value.trim().toLowerCase();
-    const cont = $('sugerencias');
+    const q = $('inpBuscar').value.trim().toLowerCase(); const cont = $('sugerencias');
     if(!q){ cont.innerHTML = ''; return; }
     const m = camiones.filter(c => c.placa.toLowerCase().includes(q) || (c.chofer||'').toLowerCase().includes(q)).slice(0, 10);
     cont.innerHTML = m.length
@@ -181,11 +191,9 @@
       : '<div class="sug"><span>Sin coincidencias</span></div>';
   }
   function elegirCam(placa){
-    const c = camiones.find(x => x.placa === placa);
-    if(!c) return;
+    const c = camiones.find(x => x.placa === placa); if(!c) return;
     estado.camion = c.placa; estado.chofer = c.chofer || ''; estado.tipo = c.tipo || '';
-    $('inpBuscar').value = c.placa;
-    $('sugerencias').innerHTML = '';
+    $('inpBuscar').value = c.placa; $('sugerencias').innerHTML = '';
     $('camSel').style.display = 'block';
     $('camSel').innerHTML = `<b>${c.placa}</b><br><span>Chofer: ${c.chofer||'-'} · Tipo: ${c.tipo||'-'}</span>`;
   }
@@ -200,12 +208,9 @@
       const r = await fetch(BACKEND_URL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
         body: JSON.stringify({ accion:'nuevoCamion', placa, chofer, tipo }) });
       const d = await r.json();
-      if(d.ok){
-        camiones.push({ placa:d.placa, chofer:d.chofer, tipo:d.tipo });
-        $('nvPlaca').value=''; $('nvChofer').value=''; $('nvTipo').value='';
-        $('formNuevo').style.display='none';
-        elegirCam(d.placa);
-        alert('Camión registrado ✓');
+      if(d.ok){ camiones.push({ placa:d.placa, chofer:d.chofer, tipo:d.tipo });
+        $('nvPlaca').value=''; $('nvChofer').value=''; $('nvTipo').value=''; $('formNuevo').style.display='none';
+        elegirCam(d.placa); alert('Camión registrado ✓');
       } else alert(d.error || 'No se pudo registrar.');
     }catch(e){ alert('Error de red: ' + e); }
     finally{ btn.disabled = false; btn.textContent = 'Guardar camión'; }
@@ -215,12 +220,12 @@
     estado.destino = $('selDestino').value;
     if(!estado.camion){ alert('Busca y elige un camión.'); return; }
     if(!estado.destino){ alert('Elige un destino.'); return; }
-    estado.codigos = []; pendientes.clear(); procesando = false;
-    $('chipCam').textContent = estado.camion;
-    $('chipDes').textContent = estado.destino;
+    estado.codigos = []; esperando = false; codPendiente = ''; ultimo = { code:"", t:0 };
+    $('chipCam').textContent = estado.camion; $('chipDes').textContent = estado.destino;
     render(); mostrar('vEscaneo');
   }
 
+  /* ---- escáner ---- */
   async function toggleScan(){
     if(escaneando){ await pararScan(); return; }
     if(typeof Html5Qrcode === 'undefined'){ alert('No se cargó el lector. Revisa tu internet o usa "Escribir código manual".'); return; }
@@ -235,25 +240,41 @@
   }
   async function pararScan(){
     if(html5qr){ try{ await html5qr.stop(); await html5qr.clear(); }catch(e){} }
-    escaneando = false; $('reader').style.display='none'; $('btnScan').textContent = '📷 Escanear código';
+    escaneando = false; esperando = false; $('reader').style.display='none'; $('btnScan').textContent = '📷 Escanear palet';
   }
+  function reanudar(){ esperando = false; if(html5qr && escaneando){ try{ html5qr.resume(); }catch(e){} } }
 
   async function onScan(code){
     code = (code || '').trim(); if(!code) return;
-    if(procesando) return; procesando = true;
-    try{
-      if(estado.codigos.includes(code) || pendientes.has(code)){ alertaDup('Código duplicado', 'El código ' + code + ' ya está en este despacho.'); return; }
-      pendientes.add(code);
-      if(BACKEND_URL){
-        try{
-          const r = await fetch(BACKEND_URL + '?codigo=' + encodeURIComponent(code));
-          const d = await r.json();
-          if(d.usado){ pendientes.delete(code); alertaDup('Código ya despachado', 'El código ' + code + ' ya fue enviado en el camion con placa: ' + d.camion + ' el ' + d.fecha + '.'); return; }
-        }catch(e){}
-      }
-      estado.codigos.push(code); pendientes.delete(code); render(); beep();
-    } finally { setTimeout(() => { procesando = false; }, 700); }
+    if(esperando) return;                                   // ya hay un modal abierto
+    const ahora = Date.now();
+    if(code === ultimo.code && ahora - ultimo.t < 2500) return;   // mismo palet al seguir enfocando: ignorar
+    ultimo = { code: code, t: ahora };
+    esperando = true;
+    try{ if(html5qr && escaneando) html5qr.pause(true); }catch(e){}   // congela la cámara mientras decides
+
+    // ¿duplicado en este despacho?
+    if(estado.codigos.includes(code)){ mostrarDup('Palet duplicado', 'El palet ' + code + ' ya está en este despacho.'); return; }
+    // ¿duplicado histórico (otro camión/fecha)?
+    if(BACKEND_URL){
+      try{
+        const r = await fetch(BACKEND_URL + '?codigo=' + encodeURIComponent(code));
+        const d = await r.json();
+        if(d.usado){ mostrarDup('Palet ya despachado', 'El palet ' + code + ' ya fue enviado en el ' + d.camion + ' el ' + d.fecha + '.'); return; }
+      }catch(e){}
+    }
+    // ok → pedir confirmación
+    codPendiente = code; $('addCod').textContent = code; $('modalAdd').classList.add('activa'); vibrar(60);
   }
+
+  function confirmarAdd(){
+    if(codPendiente && !estado.codigos.includes(codPendiente)){ estado.codigos.push(codPendiente); render(); }
+    codPendiente = ''; $('modalAdd').classList.remove('activa'); vibrar(120); reanudar();
+  }
+  function cancelarAdd(){ codPendiente = ''; $('modalAdd').classList.remove('activa'); reanudar(); }
+
+  function mostrarDup(t,m){ $('dupT').textContent = t; $('dupM').textContent = m; $('modal').classList.add('activa'); vibrar([80,60,80]); }
+  function cerrarDup(){ $('modal').classList.remove('activa'); reanudar(); }
 
   function render(){
     $('contador').textContent = estado.codigos.length;
@@ -262,18 +283,13 @@
     ).reverse().join('');
   }
   function quitar(i){ estado.codigos.splice(i,1); render(); }
-  function manual(){ const c = prompt('Código:'); if(c){ onScan(c.trim()); } }
-
-  function alertaDup(t,m){ $('dupT').textContent=t; $('dupM').textContent=m; $('modal').classList.add('activa'); if(navigator.vibrate) navigator.vibrate(200); }
-  function cerrarDup(){ $('modal').classList.remove('activa'); }
+  function manual(){ const c = prompt('Código del palet:'); if(c){ onScan(c.trim()); } }
 
   async function revisar(){
-    if(!estado.codigos.length){ alert('No hay códigos escaneados.'); return; }
+    if(!estado.codigos.length){ alert('No hay palets escaneados.'); return; }
     await pararScan();
-    $('rCam').textContent = estado.camion;
-    $('rCho').textContent = estado.chofer || '-';
-    $('rTip').textContent = estado.tipo || '-';
-    $('rDes').textContent = estado.destino;
+    $('rCam').textContent = estado.camion; $('rCho').textContent = estado.chofer || '-';
+    $('rTip').textContent = estado.tipo || '-'; $('rDes').textContent = estado.destino;
     $('rTot').textContent = estado.codigos.length;
     $('rLista').innerHTML = estado.codigos.map((c,i) => `<div class="rrow"><span>Palet ${i+1}</span><b>${c}</b></div>`).join('');
     mostrar('vResumen');
@@ -287,19 +303,17 @@
         body: JSON.stringify({ camion:estado.camion, destino:estado.destino, chofer:estado.chofer, tipo:estado.tipo, codigos:estado.codigos }) });
       const d = await r.json();
       if(d.ok){ $('finMsg').textContent = d.total_codigos + ' palets enviados y guardados.'; mostrar('vFin'); }
-      else alertaDup('No se pudo enviar', d.error || 'Error desconocido');
+      else mostrarDup('No se pudo enviar', d.error || 'Error desconocido');
     }catch(e){ alert('Error de red: ' + e); }
     finally{ btn.disabled = false; btn.textContent = '✈ Enviar despacho'; }
   }
 
   function nuevo(){
     estado = { camion:"", chofer:"", tipo:"", destino:"", codigos:[] };
-    pendientes.clear(); procesando = false;
+    esperando = false; codPendiente = ''; ultimo = { code:"", t:0 };
     $('inpBuscar').value=''; $('sugerencias').innerHTML=''; $('camSel').style.display='none'; $('selDestino').value='';
     mostrar('vInicio');
   }
-
-  function beep(){ try{ const a = new (window.AudioContext||window.webkitAudioContext)(); const o = a.createOscillator(); o.frequency.value=880; o.connect(a.destination); o.start(); setTimeout(()=>o.stop(),90); }catch(e){} }
 
   if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
   cargarListas();
