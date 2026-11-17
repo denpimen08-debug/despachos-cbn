@@ -25,10 +25,9 @@
   .card{ background:#fff; border-radius:16px; padding:16px; box-shadow:0 4px 16px rgba(15,23,42,.06); }
   button{ font-family:inherit; cursor:pointer; border:none; }
   .btn{ width:100%; height:56px; border-radius:14px; font-size:16px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px; }
-  .btn.azul{ background:var(--azul); color:#fff; }
-  .btn.negro{ background:var(--negro); color:#fff; height:74px; font-size:18px; }
-  .btn.verde{ background:#15803D; color:#fff; }
-  .btn.ghost{ background:transparent; color:var(--azul); height:44px; font-weight:700; }
+  .btn.azul{ background:var(--azul); color:#fff; } .btn.negro{ background:var(--negro); color:#fff; height:74px; font-size:18px; }
+  .btn.verde{ background:#15803D; color:#fff; } .btn.ghost{ background:transparent; color:var(--azul); height:44px; font-weight:700; }
+  .btn.sm{ height:46px; font-size:14px; }
   .btn:disabled{ opacity:.5; }
   .mt{ margin-top:14px; }
   #reader{ display:none; width:100%; border-radius:14px; overflow:hidden; margin-top:14px; background:#000; }
@@ -51,6 +50,13 @@
   .modal h3{ margin:0 0 6px; color:#991B1B; font-size:18px; } .modal p{ margin:0 0 18px; color:#B91C1C; font-size:14px; line-height:1.5; }
   .finwrap{ text-align:center; padding-top:40px; }
   .finwrap .big{ width:84px; height:84px; border-radius:50%; background:#15803D; color:#fff; font-size:44px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
+  /* buscador de camión */
+  .sug{ padding:12px 14px; border-bottom:1px solid #EDF1F7; display:flex; flex-direction:column; cursor:pointer; }
+  .sug:active{ background:#F1F6FD; } .sug b{ font-size:15px; } .sug span{ font-size:12px; color:var(--mut); }
+  #sugerencias{ background:#fff; border-radius:0 0 13px 13px; max-height:230px; overflow:auto; box-shadow:0 6px 16px rgba(15,23,42,.08); }
+  #camSel{ display:none; background:#E3ECF6; border:1.5px solid #B9CFEA; border-radius:13px; padding:12px 14px; margin-top:10px; }
+  #camSel b{ font-size:16px; color:var(--azul); } #camSel span{ font-size:13px; color:#334155; }
+  #formNuevo{ display:none; margin-top:12px; }
 </style>
 </head>
 <body>
@@ -64,12 +70,27 @@
 <main>
   <section id="vInicio" class="vista activa">
     <h2>Nuevo despacho</h2>
-    <div class="card">
-      <label for="selCamion">Camión</label>
-      <select id="selCamion"><option value="">Seleccione…</option></select>
+
+    <button class="btn ghost" onclick="toggleNuevo()">➕ Registrar nuevo camión</button>
+    <div class="card" id="formNuevo">
+      <label for="nvPlaca">Placa</label>
+      <input id="nvPlaca" placeholder="Ej: 1234-ABC">
+      <label for="nvChofer">Chofer</label>
+      <input id="nvChofer" placeholder="Nombre del chofer">
+      <label for="nvTipo">Tipo de camión</label>
+      <input id="nvTipo" placeholder="Ej: Furgón, Cisterna…">
+      <button class="btn azul sm mt" id="btnGuardarCam" onclick="guardarCamion()">Guardar camión</button>
+    </div>
+
+    <div class="card mt">
+      <label for="inpBuscar">Camión</label>
+      <input id="inpBuscar" oninput="filtrar()" placeholder="Escribe el número o la placa…" autocomplete="off">
+      <div id="sugerencias"></div>
+      <div id="camSel"></div>
       <label for="selDestino">Destino</label>
       <select id="selDestino"><option value="">Seleccione…</option></select>
     </div>
+
     <button class="btn azul mt" onclick="iniciar()">Iniciar despacho →</button>
   </section>
 
@@ -79,9 +100,9 @@
     <button class="btn ghost" onclick="manual()">+ Escribir código manual</button>
     <div class="stat">
       <div class="n" id="contador">0</div>
-      <div><div class="l">Códigos escaneados</div><div class="s">Se enviarán todos al despachar</div></div>
+      <div><div class="l">Palets escaneados</div><div class="s">Se enviarán todos al despachar</div></div>
     </div>
-    <div class="hdr">CÓDIGOS ESCANEADOS</div>
+    <div class="hdr">PALETS ESCANEADOS</div>
     <div id="lista"></div>
     <div class="barra"><button class="btn azul" onclick="revisar()">Revisar y enviar →</button></div>
   </section>
@@ -90,11 +111,13 @@
     <h2>Resumen del despacho</h2>
     <div class="card">
       <div class="rrow"><span>Camión</span><b id="rCam"></b></div>
+      <div class="rrow"><span>Chofer</span><b id="rCho"></b></div>
+      <div class="rrow"><span>Tipo</span><b id="rTip"></b></div>
       <div class="rrow"><span>Destino</span><b id="rDes"></b></div>
-      <div class="rrow" style="border:none"><span>Total de códigos</span><b id="rTot"></b></div>
+      <div class="rrow" style="border:none"><span>Total de palets</span><b id="rTot"></b></div>
     </div>
     <div class="ok">✓ Sin códigos duplicados — listo para enviar</div>
-    <div class="hdr">CÓDIGOS</div>
+    <div class="hdr">PALETS</div>
     <div class="card" id="rLista" style="padding:0"></div>
     <div class="barra"><button class="btn verde" id="btnEnviar" onclick="enviar()">✈ Enviar despacho</button></div>
   </section>
@@ -125,10 +148,10 @@
   /* =========================================== */
 
   const $ = (id) => document.getElementById(id);
-  let estado = { camion:"", destino:"", codigos:[] };
-  let html5qr = null, escaneando = false;
-  let procesando = false;            // candado: procesa un escaneo a la vez
-  const pendientes = new Set();      // códigos en verificación (evita que se cuele un duplicado)
+  let camiones = [];                 // [{placa, chofer, tipo}]
+  let estado = { camion:"", chofer:"", tipo:"", destino:"", codigos:[] };
+  let html5qr = null, escaneando = false, procesando = false;
+  const pendientes = new Set();
 
   function mostrar(id){
     document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
@@ -142,18 +165,56 @@
     try{
       const r = await fetch(BACKEND_URL);
       const d = await r.json();
-      llenar('selCamion', d.camiones || []);
-      llenar('selDestino', d.destinos || []);
+      camiones = d.camiones || [];
+      $('selDestino').innerHTML = '<option value="">Seleccione…</option>' + (d.destinos || []).map(x => `<option>${x}</option>`).join('');
     }catch(e){}
   }
-  function llenar(id, arr){
-    $(id).innerHTML = '<option value="">Seleccione…</option>' + arr.map(x => `<option>${x}</option>`).join('');
+
+  /* ---- buscador de camión ---- */
+  function filtrar(){
+    const q = $('inpBuscar').value.trim().toLowerCase();
+    const cont = $('sugerencias');
+    if(!q){ cont.innerHTML = ''; return; }
+    const m = camiones.filter(c => c.placa.toLowerCase().includes(q) || (c.chofer||'').toLowerCase().includes(q)).slice(0, 10);
+    cont.innerHTML = m.length
+      ? m.map(c => `<div class="sug" onclick="elegirCam('${c.placa.replace(/'/g,"\\'")}')"><b>${c.placa}</b><span>${c.chofer||'-'}${c.tipo? ' · '+c.tipo : ''}</span></div>`).join('')
+      : '<div class="sug"><span>Sin coincidencias</span></div>';
+  }
+  function elegirCam(placa){
+    const c = camiones.find(x => x.placa === placa);
+    if(!c) return;
+    estado.camion = c.placa; estado.chofer = c.chofer || ''; estado.tipo = c.tipo || '';
+    $('inpBuscar').value = c.placa;
+    $('sugerencias').innerHTML = '';
+    $('camSel').style.display = 'block';
+    $('camSel').innerHTML = `<b>${c.placa}</b><br><span>Chofer: ${c.chofer||'-'} · Tipo: ${c.tipo||'-'}</span>`;
+  }
+
+  /* ---- registrar camión ---- */
+  function toggleNuevo(){ const f = $('formNuevo'); f.style.display = f.style.display === 'block' ? 'none' : 'block'; }
+  async function guardarCamion(){
+    const placa = $('nvPlaca').value.trim(), chofer = $('nvChofer').value.trim(), tipo = $('nvTipo').value.trim();
+    if(!placa){ alert('Escribe la placa.'); return; }
+    const btn = $('btnGuardarCam'); btn.disabled = true; btn.textContent = 'Guardando…';
+    try{
+      const r = await fetch(BACKEND_URL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+        body: JSON.stringify({ accion:'nuevoCamion', placa, chofer, tipo }) });
+      const d = await r.json();
+      if(d.ok){
+        camiones.push({ placa:d.placa, chofer:d.chofer, tipo:d.tipo });
+        $('nvPlaca').value=''; $('nvChofer').value=''; $('nvTipo').value='';
+        $('formNuevo').style.display='none';
+        elegirCam(d.placa);
+        alert('Camión registrado ✓');
+      } else alert(d.error || 'No se pudo registrar.');
+    }catch(e){ alert('Error de red: ' + e); }
+    finally{ btn.disabled = false; btn.textContent = 'Guardar camión'; }
   }
 
   function iniciar(){
-    estado.camion = $('selCamion').value;
     estado.destino = $('selDestino').value;
-    if(!estado.camion || !estado.destino){ alert('Elige camión y destino.'); return; }
+    if(!estado.camion){ alert('Busca y elige un camión.'); return; }
+    if(!estado.destino){ alert('Elige un destino.'); return; }
     estado.codigos = []; pendientes.clear(); procesando = false;
     $('chipCam').textContent = estado.camion;
     $('chipDes').textContent = estado.destino;
@@ -179,30 +240,19 @@
 
   async function onScan(code){
     code = (code || '').trim(); if(!code) return;
-    if(procesando) return;            // ya hay un escaneo en curso: ignora
-    procesando = true;
+    if(procesando) return; procesando = true;
     try{
-      // duplicado inmediato (ya está en la lista o en verificación)
-      if(estado.codigos.includes(code) || pendientes.has(code)){
-        alertaDup('Código duplicado', 'El código ' + code + ' ya está en este despacho.');
-        return;
-      }
+      if(estado.codigos.includes(code) || pendientes.has(code)){ alertaDup('Código duplicado', 'El código ' + code + ' ya está en este despacho.'); return; }
       pendientes.add(code);
       if(BACKEND_URL){
         try{
           const r = await fetch(BACKEND_URL + '?codigo=' + encodeURIComponent(code));
           const d = await r.json();
-          if(d.usado){
-            pendientes.delete(code);
-            alertaDup('Código ya despachado', 'El código ' + code + ' ya fue enviado en el ' + d.camion + ' el ' + d.fecha + '.');
-            return;
-          }
+          if(d.usado){ pendientes.delete(code); alertaDup('Código ya despachado', 'El código ' + code + ' ya fue enviado en el ' + d.camion + ' el ' + d.fecha + '.'); return; }
         }catch(e){}
       }
       estado.codigos.push(code); pendientes.delete(code); render(); beep();
-    } finally {
-      setTimeout(() => { procesando = false; }, 700);   // respiro para no releer el mismo código
-    }
+    } finally { setTimeout(() => { procesando = false; }, 700); }
   }
 
   function render(){
@@ -221,10 +271,11 @@
     if(!estado.codigos.length){ alert('No hay códigos escaneados.'); return; }
     await pararScan();
     $('rCam').textContent = estado.camion;
+    $('rCho').textContent = estado.chofer || '-';
+    $('rTip').textContent = estado.tipo || '-';
     $('rDes').textContent = estado.destino;
     $('rTot').textContent = estado.codigos.length;
-    $('rLista').innerHTML = estado.codigos.map((c,i) =>
-      `<div class="rrow"><span>Código ${i+1}</span><b>${c}</b></div>`).join('');
+    $('rLista').innerHTML = estado.codigos.map((c,i) => `<div class="rrow"><span>Palet ${i+1}</span><b>${c}</b></div>`).join('');
     mostrar('vResumen');
   }
 
@@ -232,19 +283,21 @@
     if(!BACKEND_URL){ alert('Falta configurar la URL del backend.'); return; }
     const btn = $('btnEnviar'); btn.disabled = true; btn.textContent = 'Enviando…';
     try{
-      const r = await fetch(BACKEND_URL, {
-        method:'POST',
-        headers:{ 'Content-Type':'text/plain;charset=utf-8' },
-        body: JSON.stringify({ camion:estado.camion, destino:estado.destino, codigos:estado.codigos })
-      });
+      const r = await fetch(BACKEND_URL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+        body: JSON.stringify({ camion:estado.camion, destino:estado.destino, chofer:estado.chofer, tipo:estado.tipo, codigos:estado.codigos }) });
       const d = await r.json();
-      if(d.ok){ $('finMsg').textContent = d.total_codigos + ' códigos enviados y guardados.'; mostrar('vFin'); }
-      else { alertaDup('No se pudo enviar', d.error || 'Error desconocido'); }
+      if(d.ok){ $('finMsg').textContent = d.total_codigos + ' palets enviados y guardados.'; mostrar('vFin'); }
+      else alertaDup('No se pudo enviar', d.error || 'Error desconocido');
     }catch(e){ alert('Error de red: ' + e); }
     finally{ btn.disabled = false; btn.textContent = '✈ Enviar despacho'; }
   }
 
-  function nuevo(){ estado = { camion:"", destino:"", codigos:[] }; pendientes.clear(); procesando = false; $('selCamion').value=''; $('selDestino').value=''; mostrar('vInicio'); }
+  function nuevo(){
+    estado = { camion:"", chofer:"", tipo:"", destino:"", codigos:[] };
+    pendientes.clear(); procesando = false;
+    $('inpBuscar').value=''; $('sugerencias').innerHTML=''; $('camSel').style.display='none'; $('selDestino').value='';
+    mostrar('vInicio');
+  }
 
   function beep(){ try{ const a = new (window.AudioContext||window.webkitAudioContext)(); const o = a.createOscillator(); o.frequency.value=880; o.connect(a.destination); o.start(); setTimeout(()=>o.stop(),90); }catch(e){} }
 
