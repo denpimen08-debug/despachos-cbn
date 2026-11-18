@@ -73,9 +73,10 @@
     <h2>Nuevo despacho</h2>
     <button class="btn ghost" onclick="toggleNuevo()">➕ Registrar nuevo camión</button>
     <div class="card" id="formNuevo">
-      <label for="nvPlaca">Placa</label><input id="nvPlaca" placeholder="Ej: 1234-ABC">
-      <label for="nvChofer">Chofer</label><input id="nvChofer" placeholder="Nombre del chofer">
-      <label for="nvTipo">Tipo de camión</label><input id="nvTipo" placeholder="Ej: Furgón, Cisterna…">
+      <label for="nvPlaca">Placa</label><input id="nvPlaca" placeholder="EJ: 1234-ABC" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+      <label for="nvChofer">Chofer</label><input id="nvChofer" placeholder="NOMBRE DEL CHOFER" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+      <label for="nvTipo">Tipo de camión</label>
+      <select id="nvTipo"><option value="">Seleccione…</option><option>ABIERTO</option><option>FURGON</option><option>SIDER</option><option>MODIFICADO</option><option>ACOPLADO</option></select>
       <button class="btn azul sm mt" id="btnGuardarCam" onclick="guardarCamion()">Guardar camión</button>
     </div>
     <div class="card mt">
@@ -201,8 +202,9 @@
   /* ---- registrar camión ---- */
   function toggleNuevo(){ const f = $('formNuevo'); f.style.display = f.style.display === 'block' ? 'none' : 'block'; }
   async function guardarCamion(){
-    const placa = $('nvPlaca').value.trim(), chofer = $('nvChofer').value.trim(), tipo = $('nvTipo').value.trim();
+    const placa = $('nvPlaca').value.trim().toUpperCase(), chofer = $('nvChofer').value.trim().toUpperCase(), tipo = $('nvTipo').value;
     if(!placa){ alert('Escribe la placa.'); return; }
+    if(!tipo){ alert('Elige el tipo de camión.'); return; }
     const btn = $('btnGuardarCam'); btn.disabled = true; btn.textContent = 'Guardando…';
     try{
       const r = await fetch(BACKEND_URL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
@@ -247,14 +249,15 @@
   async function onScan(code){
     code = (code || '').trim(); if(!code) return;
     if(esperando) return;                                   // ya hay un modal abierto
+    const key = code.toUpperCase();                         // comparación sin importar mayúsculas
     const ahora = Date.now();
-    if(code === ultimo.code && ahora - ultimo.t < 2500) return;   // mismo palet al seguir enfocando: ignorar
-    ultimo = { code: code, t: ahora };
+    if(key === ultimo.code && ahora - ultimo.t < 2500) return;   // mismo palet al seguir enfocando: ignorar
+    ultimo = { code: key, t: ahora };
     esperando = true;
     try{ if(html5qr && escaneando) html5qr.pause(true); }catch(e){}   // congela la cámara mientras decides
 
     // ¿duplicado en este despacho?
-    if(estado.codigos.includes(code)){ mostrarDup('Palet duplicado', 'El palet ' + code + ' ya está en este despacho.'); return; }
+    if(estado.codigos.some(c => c.toUpperCase() === key)){ mostrarDup('Palet duplicado', 'El palet ' + code + ' ya está en este despacho.'); return; }
     // ¿duplicado histórico (otro camión/fecha)?
     if(BACKEND_URL){
       try{
